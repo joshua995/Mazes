@@ -16,7 +16,6 @@ class Cell:
         self.y = y  # y pos of the top left corner of the cell
         self.center = [x + (size // 2), y + (size // 2)]  # center of the cell
         self.visited = False  # keeps track of whether the cell has been used during generation phase
-        self.index = -1  # keeps track of its spot in the maze (path generation)
         self.right = None
         self.bottom = None
 
@@ -97,7 +96,6 @@ if __name__ == "__main__":
     while not closeWindow:
         screen.fill(BLACK)
         for c in cells:
-            c.index = -1
             c.visited = False
         closeWindow = recCreateMaze(cells[0], closeWindow)
         if closeWindow:
