@@ -36,9 +36,9 @@ WINDOW_SIZE = 750  # WINDOW_SIZE default 750
 screen = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
 pygame.display.set_caption("Recursive Backtracking"), screen.fill(BLACK)
 
-CELL_SIZE = 30  # change this to change the size of the maze
-MAZE_DRAW_DELAY = 30  # Speed of which the maze generation is displayed in FPS
-PATH_DRAW_DELAY = 15  # Speed of which the path generation is displayed in FPS
+CELL_SIZE = 7  # change this to change the size of the maze
+MAZE_DRAW_DELAY = 60  # Speed of which the maze generation is displayed in FPS
+PATH_DRAW_DELAY = 30  # Speed of which the path generation is displayed in FPS
 
 CELLS_SIZE = WINDOW_SIZE // CELL_SIZE
 cells = []
@@ -57,16 +57,19 @@ def initcells():
     getCellNeighbours()
 
 
-def getCellNeighbours():
-    for c in cells:
-        for c1 in cells:
-            if (
-                (c.x == c1.x and c.y == c1.y + CELL_SIZE)
-                or (c.x == c1.x and c.y == c1.y - CELL_SIZE)
-                or (c.x == c1.x + CELL_SIZE and c.y == c1.y)
-                or (c.x == c1.x - CELL_SIZE and c.y == c1.y)
-            ):
-                c.neighbours.append(c1)
+getCellNeighbours = lambda: [
+    [
+        c.neighbours.append(c1)
+        for c1 in cells
+        if (
+            (c.x == c1.x and c.y == c1.y + CELL_SIZE)
+            or (c.x == c1.x and c.y == c1.y - CELL_SIZE)
+            or (c.x == c1.x + CELL_SIZE and c.y == c1.y)
+            or (c.x == c1.x - CELL_SIZE and c.y == c1.y)
+        )
+    ]
+    for c in cells
+]
 
 
 def createMaze():
@@ -90,9 +93,11 @@ def createMaze():
             if event.type == pygame.QUIT:
                 return startCell, endCell, True
         usableCells = []
-        for c in usedCells[len(usedCells) - 1].neighbours:
-            if not c.visited:
-                usableCells.append(c)
+        [
+            usableCells.append(c)
+            for c in usedCells[len(usedCells) - 1].neighbours
+            if not c.visited
+        ]
         if len(usableCells) != 0:
             counter += 1
             currentCell = usableCells[randint(0, len(usableCells) - 1)]
@@ -153,9 +158,14 @@ if __name__ == "__main__":
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 closeWindow = True
-        for data in mazeData:
-            line(screen, WHITE, data[0], data[1], data[2])
-            rect(screen, WHITE, data[3])
+        [
+            (
+                line(screen, WHITE, data[0], data[1], data[2]),
+                rect(screen, WHITE, data[3]),
+            )
+            for data in mazeData
+        ]
+
         circle(screen, GREEN, (startCell.centerX, startCell.centerY), CELL_SIZE // 4)
         circle(screen, GREEN, (endCell.centerX, endCell.centerY), CELL_SIZE // 4)
         if drawPath():

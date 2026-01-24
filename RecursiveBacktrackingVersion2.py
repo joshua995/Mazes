@@ -44,7 +44,7 @@ WINDOW_SIZE = 750  # WINDOW_SIZE default 750
 screen = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
 pygame.display.set_caption("Recursive Backtracking"), screen.fill(BLACK)
 
-CELL_SIZE = 30  # change this to change the size of the maze
+CELL_SIZE = 15  # change this to change the size of the maze BUG at 15
 MAZE_DRAW_DELAY = 40  # Speed of which the maze generation is displayed in FPS
 PATH_DRAW_DELAY = 15  # Speed of which the path generation is displayed in FPS
 
@@ -64,16 +64,20 @@ def initcells():
     getCellNeighbours()
 
 
-def getCellNeighbours():  # get the left, right, top, and bottom adjacent cells
-    for c in cells:
-        for c1 in cells:
-            if (
-                (c.x == c1.x and c.y == c1.y + CELL_SIZE)
-                or (c.x == c1.x and c.y == c1.y - CELL_SIZE)
-                or (c.x == c1.x + CELL_SIZE and c.y == c1.y)
-                or (c.x == c1.x - CELL_SIZE and c.y == c1.y)
-            ):
-                c.neighbours.append(c1)
+# get the left, right, top, and bottom adjacent cells
+getCellNeighbours = lambda: [
+    [
+        c.neighbours.append(c1)
+        for c1 in cells
+        if (
+            (c.x == c1.x and c.y == c1.y + CELL_SIZE)
+            or (c.x == c1.x and c.y == c1.y - CELL_SIZE)
+            or (c.x == c1.x + CELL_SIZE and c.y == c1.y)
+            or (c.x == c1.x - CELL_SIZE and c.y == c1.y)
+        )
+    ]
+    for c in cells
+]
 
 
 def recCreateMaze(counter, currentCell, endCell, closeWindow):
