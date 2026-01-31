@@ -36,7 +36,7 @@ WINDOW_SIZE = 750  # WINDOW_SIZE default 750
 screen = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
 pygame.display.set_caption("Recursive Backtracking"), screen.fill(BLACK)
 
-CELL_SIZE = 7  # change this to change the size of the maze
+CELL_SIZE = 6  # change this to change the size of the maze
 MAZE_DRAW_DELAY = 60  # Speed of which the maze generation is displayed in FPS
 PATH_DRAW_DELAY = 30  # Speed of which the path generation is displayed in FPS
 
