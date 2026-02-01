@@ -1,5 +1,9 @@
 """
 Joshua Liu
+
+To many for loops, slow
+
+
 Start: Choose a random cell on the grid and mark it as part of the maze (visited).
 Initialize Frontier: Add all of the unvisited neighboring cells of the starting cell to a list or set called the "frontier".
 Iterate: While the frontier list is not empty, repeat the following steps:
@@ -45,9 +49,7 @@ class Cell:
     def drawWalls(self):
         for i, wall in enumerate(self.walls):
             if self.wallsToDraw[i]:
-                pygame.draw.line(
-                    screen, colorList[i], wall[0], wall[1], width=widthList[i]
-                )
+                pygame.draw.line(screen, WHITE, wall[0], wall[1], width=1)
 
     def expand(self):
         self.visited = True
@@ -55,7 +57,7 @@ class Cell:
         for n in self.neighbours:
             if n.visited:
                 visitedNeighbours.append(n)
-            else:
+            elif not n.visited and not frontier.__contains__(n):
                 frontier.append(n)
         cellToExpand = choice(visitedNeighbours)
         chosenVisited = self.getWhichNeighbour(cellToExpand)
@@ -77,25 +79,21 @@ class Cell:
             self.leftNeighbour.x == cellToCheck.x
             and self.leftNeighbour.y == cellToCheck.y
         ):
-            print("Left")
             return "left"
         elif self.rightNeighbour is not None and (
             self.rightNeighbour.x == cellToCheck.x
             and self.rightNeighbour.y == cellToCheck.y
         ):
-            print("Right")
             return "right"
         elif self.topNeighbour is not None and (
             self.topNeighbour.x == cellToCheck.x
             and self.topNeighbour.y == cellToCheck.y
         ):
-            print("Top")
             return "top"
         elif self.botNeighbour is not None and (
             self.botNeighbour.x == cellToCheck.x
             and self.botNeighbour.y == cellToCheck.y
         ):
-            print("Bot")
             return "bot"
 
 
@@ -112,7 +110,7 @@ WINDOW_SIZE = 750  # WINDOW_SIZE default 750
 screen = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
 pygame.display.set_caption("Prims"), screen.fill(BLACK)
 
-CELL_SIZE = 50  # change this to change the size of the maze BUG at 15
+CELL_SIZE = 20  # change this to change the size of the maze BUG at 15
 MAZE_DRAW_DELAY = 40  # Speed of which the maze generation is displayed in FPS
 PATH_DRAW_DELAY = 15  # Speed of which the path generation is displayed in FPS
 
@@ -183,16 +181,19 @@ if __name__ == "__main__":
     for c in cells:
         c.index = -1
         c.visited = False
-        print(len(c.neighbours))
-        # print(c.x, c.y)
-        # [print(n.x, n.y, end=", ") for n in c.neighbours if n is not None]
-        # print("\n")
     startCell = choice(cells)
     startCell.visited = True
 
-    frontier = [n for n in startCell.neighbours if n is not None or not n.visited]
+    frontier = [n for n in startCell.neighbours if not n.visited]
     while not closeWindow:
-        screen.fill(WHITE)
+        while len(frontier) > 0:
+            screen.fill(BLACK)
+            chosenCell = choice(frontier)
+            chosenCell.expand()
+            frontier.remove(chosenCell)
+            [cell.drawWalls() for cell in cells]
+            clock.tick(60)
+            pygame.display.update()
 
         if closeWindow:
             break
@@ -200,18 +201,18 @@ if __name__ == "__main__":
             if event.type == pygame.QUIT:
                 closeWindow = True
             if event.type == pygame.MOUSEBUTTONDOWN:
-                while len(frontier) > 0:
-                    print(len(frontier))
-                    screen.fill(WHITE)
-                    chosenCell = choice(frontier)
-                    frontier.remove(chosenCell)
-                    chosenCell.expand()
-                    listToRemove = []
-                    [listToRemove.append(f) for f in frontier if f.visited]
-                    [frontier.remove(f) for f in listToRemove]
-                    [cell.drawWalls() for cell in cells]
-                    # clock.tick(60)
-                    pygame.display.update()
+                pass
+                # if len(frontier) > 0:
+                #     screen.fill(BLACK)
+                #     chosenCell = choice(frontier)
+                #     chosenCell.expand()
+                #     [
+                #         frontier.remove(chosenCell)
+                #         for _ in range(frontier.count(chosenCell))
+                #     ]
+                #     [cell.drawWalls() for cell in cells]
+                #     clock.tick(60)
+                #     pygame.display.update()
 
         [cell.drawWalls() for cell in cells]
         if closeWindow:
