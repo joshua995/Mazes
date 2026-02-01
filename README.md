@@ -1,7 +1,10 @@
 # Mazes
 
 Recursive Backtracking
-  - Both
+  - Run RecursiveBacktrackingVersion1.py
 
 Binary Tree
   - Run BinaryTreeGeneration.py
+
+Prims
+  - Run Prims.py 

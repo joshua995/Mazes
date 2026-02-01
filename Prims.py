@@ -16,8 +16,8 @@ Finish: The process ends when the frontier list is empty and all cells are conne
 """
 
 import pygame
-from pygame.draw import circle, line, rect
-from random import randint, choice
+from pygame.draw import line, rect
+from random import choice
 
 
 class Cell:
@@ -49,7 +49,7 @@ class Cell:
     def drawWalls(self):
         for i, wall in enumerate(self.walls):
             if self.wallsToDraw[i]:
-                pygame.draw.line(screen, WHITE, wall[0], wall[1], width=1)
+                pygame.draw.line(screen, colorList[i], wall[0], wall[1], width=widthList[i])
 
     def expand(self):
         self.visited = True
@@ -101,7 +101,7 @@ pygame.init()
 
 clock = pygame.time.Clock()
 
-colorList = {0: (0, 0, 0), 1: (255, 0, 0), 2: (0, 255, 0), 3: (0, 0, 255)}
+colorList = {0: (255, 255, 255), 1: (255, 0, 0), 2: (0, 255, 0), 3: (0, 0, 255)}
 widthList = {0: 1, 1: 5, 2: 10, 3: 15}
 
 BLACK, WHITE, GREEN = (0, 0, 0), (255, 255, 255), (0, 255, 0)
@@ -110,7 +110,7 @@ WINDOW_SIZE = 750  # WINDOW_SIZE default 750
 screen = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
 pygame.display.set_caption("Prims"), screen.fill(BLACK)
 
-CELL_SIZE = 20  # change this to change the size of the maze BUG at 15
+CELL_SIZE = 30  # change this to change the size of the maze BUG at 15
 MAZE_DRAW_DELAY = 40  # Speed of which the maze generation is displayed in FPS
 PATH_DRAW_DELAY = 15  # Speed of which the path generation is displayed in FPS
 

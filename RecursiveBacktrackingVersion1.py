@@ -114,9 +114,9 @@ def createMaze():
                 CELL_SIZE // 2,
                 CELL_SIZE // 2,
             )
-            rect(screen, WHITE, rect1)
+            rect(screen, (len(mazeData) * 1 % 255, 0, 0), rect1)
             mazeData.append([lineStart, lineEnd, CELL_SIZE // 2, rect1])
-            line(screen, WHITE, lineStart, lineEnd, CELL_SIZE // 2)
+            line(screen, (len(mazeData) * 1 % 255, 0, 0), lineStart, lineEnd, CELL_SIZE // 2)
             lineStart = lineEnd
             clock.tick(MAZE_DRAW_DELAY)
             pygame.display.update()
@@ -160,10 +160,10 @@ if __name__ == "__main__":
                 closeWindow = True
         [
             (
-                line(screen, WHITE, data[0], data[1], data[2]),
-                rect(screen, WHITE, data[3]),
+                line(screen,  (i * 1 % 255, 0, 0), data[0], data[1], data[2]),
+                rect(screen, (i * 1 % 255, 0, 0), data[3]),
             )
-            for data in mazeData
+            for i, data in enumerate(mazeData)
         ]
 
         circle(screen, GREEN, (startCell.centerX, startCell.centerY), CELL_SIZE // 4)
