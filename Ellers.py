@@ -1,23 +1,10 @@
 """
 Joshua Liu
-
-To many for loops, slow
-
-
-Start: Choose a random cell on the grid and mark it as part of the maze (visited).
-Initialize Frontier: Add all of the unvisited neighboring cells of the starting cell to a list or set called the "frontier".
-Iterate: While the frontier list is not empty, repeat the following steps:
-Pick a Random Cell: Select a cell at random from the frontier list.
-Connect to Maze: Randomly select one of the chosen cell's neighbors that is already in the maze (visited).
-Carve Passage: Remove the wall between the random frontier cell and its connected maze neighbor, making a passage.
-Mark as Visited: Mark the frontier cell as part of the maze (visited) and remove it from the frontier list.
-Update Frontier: Add all of the unvisited neighbors of the newly added cell to the frontier list.
-Finish: The process ends when the frontier list is empty and all cells are connected to the main maze structure, ensuring a perfect maze with no loops.
 """
 
 import pygame
 from pygame.draw import line, rect
-from random import choice
+from random import randint, choice
 
 
 class Cell:
@@ -34,7 +21,7 @@ class Cell:
             [(x, y + size), (x + size, y + size)],  # Bot wall
         ]  # pygame line coordinates
         self.wallsToDraw = [True, True, True, True]
-        self.index = -1  # keeps track of its spot in the maze (path generation)
+        self.group = -1  # keeps track of its spot in the maze (path generation)
         self.leftNeighbour = None
         self.rightNeighbour = None
         self.topNeighbour = None
@@ -52,29 +39,6 @@ class Cell:
                 pygame.draw.line(
                     screen, colorList[i], wall[0], wall[1], width=widthList[i]
                 )
-
-    def expand(self):
-        self.visited = True
-        visitedNeighbours = []
-        for n in self.neighbours:
-            if n.visited:
-                visitedNeighbours.append(n)
-            elif not n.visited and not frontier.__contains__(n):
-                frontier.append(n)
-        cellToExpand = choice(visitedNeighbours)
-        chosenVisited = self.getWhichNeighbour(cellToExpand)
-        if chosenVisited == "left":
-            self.wallsToDraw[0] = False
-            cellToExpand.wallsToDraw[2] = False
-        elif chosenVisited == "right":
-            self.wallsToDraw[2] = False
-            cellToExpand.wallsToDraw[0] = False
-        elif chosenVisited == "top":
-            self.wallsToDraw[1] = False
-            cellToExpand.wallsToDraw[3] = False
-        elif chosenVisited == "bot":
-            self.wallsToDraw[3] = False
-            cellToExpand.wallsToDraw[1] = False
 
     def getWhichNeighbour(self, cellToCheck):
         if self.leftNeighbour is not None and (
@@ -111,11 +75,11 @@ WINDOW_SIZE = 750  # WINDOW_SIZE default 750
 screen = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
 pygame.display.set_caption("Prims"), screen.fill(BLACK)
 
-CELL_SIZE = 6  # change this to change the size of the maze BUG at 15
+CELL_SIZE = 30  # change this to change the size of the maze BUG at 15
 MAZE_DRAW_DELAY = 40  # Speed of which the maze generation is displayed in FPS
 PATH_DRAW_DELAY = 15  # Speed of which the path generation is displayed in FPS
 
-widthList = {0: CELL_SIZE // 8, 1: CELL_SIZE // 6, 2: CELL_SIZE // 4, 3: CELL_SIZE//2}
+widthList = {0: CELL_SIZE // 8, 1: CELL_SIZE // 6, 2: CELL_SIZE // 4, 3: CELL_SIZE // 2}
 
 CELLS_SIZE = WINDOW_SIZE // CELL_SIZE
 cells = []  # list to store all the cells
@@ -127,10 +91,15 @@ closeWindow = False  # termination flag
 
 initcells = lambda: (
     [
-        [
-            cells.append(Cell(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE))
-            for x in range(CELLS_SIZE)
-        ]
+        (
+            cells.append([]),
+            [
+                cells[len(cells) - 1].append(
+                    Cell(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE)
+                )
+                for x in range(CELLS_SIZE)
+            ],
+        )
         for y in range(CELLS_SIZE)
     ],
     getCellNeighbours(),
@@ -139,23 +108,25 @@ initcells = lambda: (
 
 # get the left, right, top, and bottom adjacent cells
 def getCellNeighbours():
-    for c in cells:
-        for c1 in cells:
-            if (
-                (top := (c.x == c1.x and c.y == c1.y + CELL_SIZE))
-                or (bot := (c.x == c1.x and c.y == c1.y - CELL_SIZE))
-                or (left := (c.x == c1.x + CELL_SIZE and c.y == c1.y))
-                or (right := (c.x == c1.x - CELL_SIZE and c.y == c1.y))
-            ):
-                if bot:
-                    c.botNeighbour = c1
-                elif top:
-                    c.topNeighbour = c1
-                elif left:
-                    c.leftNeighbour = c1
-                elif right:
-                    c.rightNeighbour = c1
-                c.neighbours.append(c1)
+    for cc in cells:
+        for c in cc:
+            for cc1 in cells:
+                for c1 in cc1:
+                    if (
+                        (top := (c.x == c1.x and c.y == c1.y + CELL_SIZE))
+                        or (bot := (c.x == c1.x and c.y == c1.y - CELL_SIZE))
+                        or (left := (c.x == c1.x + CELL_SIZE and c.y == c1.y))
+                        or (right := (c.x == c1.x - CELL_SIZE and c.y == c1.y))
+                    ):
+                        if bot:
+                            c.botNeighbour = c1
+                        elif top:
+                            c.topNeighbour = c1
+                        elif left:
+                            c.leftNeighbour = c1
+                        elif right:
+                            c.rightNeighbour = c1
+                        c.neighbours.append(c1)
 
 
 def recDrawPath(cell, closeWindow):
@@ -181,43 +152,78 @@ def recDrawPath(cell, closeWindow):
 
 if __name__ == "__main__":
     initcells()
-    for c in cells:
-        c.index = -1
-        c.visited = False
-    startCell = choice(cells)
-    startCell.visited = True
+    for cc in cells:
+        for c in cc:
+            c.index = -1
+            c.visited = False
 
-    frontier = [n for n in startCell.neighbours if not n.visited]
+    mapSets = {}
+    start = 0
+    for cell in cells[0]:
+        if cell.group == -1:
+            cell.group = start
+            mapSets.update({start: [cell]})
+            start += 1
+    for i, cell in enumerate(cells[0]):
+        if cell.rightNeighbour is not None and cell.rightNeighbour.group != cell.group:
+            if randint(0, 1) == 0:
+                cell.wallsToDraw[2] = False
+                cell.rightNeighbour.wallsToDraw[0] = False
+                mapSets[cell.rightNeighbour.group].remove(cell.rightNeighbour)
+                mapSets[cell.group].append(cell.rightNeighbour)
+                cell.rightNeighbour.group = cell.group
+    for l in range(len(cells[0]) - 1):
+        listOfRowGroups = []
+        for cell in cells[l]:
+            (
+                listOfRowGroups.append(cell.group)
+                if not listOfRowGroups.__contains__(cell.group)
+                else ""
+            )
+        print(listOfRowGroups)
+        for group in listOfRowGroups:
+            chosenCell = choice(mapSets[group])
+            if chosenCell.botNeighbour is not None:
+                chosenCell.wallsToDraw[3] = False
+                chosenCell.botNeighbour.wallsToDraw[1] = False
+                mapSets[chosenCell.group].remove(chosenCell)
+                mapSets[chosenCell.group].append(chosenCell.botNeighbour)
+                chosenCell.botNeighbour.group = chosenCell.group
+        for cell in cells[l + 1]:
+            if cell.group == -1:
+                cell.group = start
+                mapSets.update({start: [cell]})
+                start += 1
+        for cell in cells[l + 1]:
+            if cell.rightNeighbour is not None:
+                if randint(0, 1) == 0:
+                    cell.wallsToDraw[2] = False
+                    cell.rightNeighbour.wallsToDraw[0] = False
+                    mapSets[cell.rightNeighbour.group].remove(cell.rightNeighbour)
+                    mapSets[cell.group].append(cell.rightNeighbour)
+                    cell.rightNeighbour.group = cell.group
+
+    for cell in cells[len(cells) - 1]:
+        if cell.rightNeighbour is not None:
+            cell.wallsToDraw[2] = False
+            cell.rightNeighbour.wallsToDraw[0] = False
+            mapSets[cell.rightNeighbour.group].remove(cell.rightNeighbour)
+            mapSets[cell.group].append(cell.rightNeighbour)
+            cell.rightNeighbour.group = cell.group
+
+    # for row in cells:
+    #     for cell in row:
+    #         if cell.group > -1:
+    #             print(cell.group, end=" ")
+    #     print()
     while not closeWindow:
-        while len(frontier) > 0:
-            screen.fill(BLACK)
-            chosenCell = choice(frontier)
-            chosenCell.expand()
-            frontier.remove(chosenCell)
-            [cell.drawWalls() for cell in cells]
-            clock.tick(60)
-            pygame.display.update()
-
         if closeWindow:
             break
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 closeWindow = True
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                pass
-                # if len(frontier) > 0:
-                #     screen.fill(BLACK)
-                #     chosenCell = choice(frontier)
-                #     chosenCell.expand()
-                #     [
-                #         frontier.remove(chosenCell)
-                #         for _ in range(frontier.count(chosenCell))
-                #     ]
-                #     [cell.drawWalls() for cell in cells]
-                #     clock.tick(60)
-                #     pygame.display.update()
 
-        [cell.drawWalls() for cell in cells]
+        [[cell.drawWalls() for cell in cells[i]] for i in range(len(cells))]
         if closeWindow:
             break
         # clock.tick(0.5)

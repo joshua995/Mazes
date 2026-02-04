@@ -32,15 +32,15 @@ clock = pygame.time.Clock()
 
 BLACK, WHITE, GREEN = (0, 0, 0), (255, 255, 255), (0, 255, 0)
 
-WINDOW_SIZE = 750  # WINDOW_SIZE default 750
-screen = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
+WINDOW_SIZE = [1500, 750]  # WINDOW_SIZE default 750
+screen = pygame.display.set_mode((WINDOW_SIZE[0], WINDOW_SIZE[1]))
 pygame.display.set_caption("Recursive Backtracking"), screen.fill(BLACK)
 
-CELL_SIZE = 6  # change this to change the size of the maze
+CELL_SIZE = 20  # change this to change the size of the maze
 MAZE_DRAW_DELAY = 60  # Speed of which the maze generation is displayed in FPS
 PATH_DRAW_DELAY = 30  # Speed of which the path generation is displayed in FPS
 
-CELLS_SIZE = WINDOW_SIZE // CELL_SIZE
+CELLS_SIZE = [WINDOW_SIZE[0] // CELL_SIZE, WINDOW_SIZE[1] // CELL_SIZE]
 cells = []
 
 mazeData = []
@@ -50,8 +50,8 @@ closeWindow = False
 
 
 def initcells():
-    for y in range(CELLS_SIZE):
-        for x in range(CELLS_SIZE):
+    for y in range(CELLS_SIZE[1]):
+        for x in range(CELLS_SIZE[0]):
             tempCell = Cell(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE)
             cells.append(tempCell)
     getCellNeighbours()
@@ -114,9 +114,15 @@ def createMaze():
                 CELL_SIZE // 2,
                 CELL_SIZE // 2,
             )
-            rect(screen, (len(mazeData) * 1 % 255, 0, 0), rect1)
             mazeData.append([lineStart, lineEnd, CELL_SIZE // 2, rect1])
-            line(screen, (len(mazeData) * 1 % 255, 0, 0), lineStart, lineEnd, CELL_SIZE // 2)
+            rect(screen, (len(mazeData) * 1 % 255, 25, 0), rect1)
+            line(
+                screen,
+                (len(mazeData) * 1 % 255, 25, 0),
+                lineStart,
+                lineEnd,
+                CELL_SIZE // 2,
+            )
             lineStart = lineEnd
             clock.tick(MAZE_DRAW_DELAY)
             pygame.display.update()
@@ -160,7 +166,7 @@ if __name__ == "__main__":
                 closeWindow = True
         [
             (
-                line(screen,  (i * 1 % 255, 0, 0), data[0], data[1], data[2]),
+                line(screen, (i * 1 % 255, 0, 0), data[0], data[1], data[2]),
                 rect(screen, (i * 1 % 255, 0, 0), data[3]),
             )
             for i, data in enumerate(mazeData)
