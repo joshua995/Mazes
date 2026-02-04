@@ -129,34 +129,12 @@ def getCellNeighbours():
                         c.neighbours.append(c1)
 
 
-def recDrawPath(cell, closeWindow):
-    for n in cell.neighbours:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return True
-        if cell.index - 1 != n.index:
-            continue
-        rect1 = pygame.Rect(
-            cell.center[0] - CELL_SIZE // 4,
-            cell.center[1] - CELL_SIZE // 4,
-            CELL_SIZE // 2,
-            CELL_SIZE // 2,
-        )
-        rect(screen, GREEN, rect1)
-        line(screen, GREEN, n.center, cell.center, CELL_SIZE // 2)
-        clock.tick(PATH_DRAW_DELAY)
-        pygame.display.update()
-        closeWindow = recDrawPath(n, closeWindow)
-    return closeWindow
-
-
 if __name__ == "__main__":
     initcells()
     for cc in cells:
         for c in cc:
             c.index = -1
             c.visited = False
-
     mapSets = {}
     start = 0
     for cell in cells[0]:
@@ -172,7 +150,7 @@ if __name__ == "__main__":
                 mapSets[cell.rightNeighbour.group].remove(cell.rightNeighbour)
                 mapSets[cell.group].append(cell.rightNeighbour)
                 cell.rightNeighbour.group = cell.group
-    for l in range(len(cells[0]) - 1):
+    for l in range(len(cells) - 1):
         listOfRowGroups = []
         for cell in cells[l]:
             (
@@ -180,13 +158,12 @@ if __name__ == "__main__":
                 if not listOfRowGroups.__contains__(cell.group)
                 else ""
             )
-        print(listOfRowGroups)
         for group in listOfRowGroups:
             chosenCell = choice(mapSets[group])
             if chosenCell.botNeighbour is not None:
                 chosenCell.wallsToDraw[3] = False
                 chosenCell.botNeighbour.wallsToDraw[1] = False
-                mapSets[chosenCell.group].remove(chosenCell)
+                mapSets[chosenCell.group] = []
                 mapSets[chosenCell.group].append(chosenCell.botNeighbour)
                 chosenCell.botNeighbour.group = chosenCell.group
         for cell in cells[l + 1]:
@@ -203,6 +180,15 @@ if __name__ == "__main__":
                     mapSets[cell.group].append(cell.rightNeighbour)
                     cell.rightNeighbour.group = cell.group
 
+    mapSets = {}
+
+    for cc in cells:
+        for c in cc:
+            if not mapSets.keys().__contains__(c.group):
+                mapSets.update({c.group: [c]})
+            else:
+                mapSets[c.group].append(c)
+
     for cell in cells[len(cells) - 1]:
         if cell.rightNeighbour is not None:
             cell.wallsToDraw[2] = False
@@ -211,11 +197,16 @@ if __name__ == "__main__":
             mapSets[cell.group].append(cell.rightNeighbour)
             cell.rightNeighbour.group = cell.group
 
-    # for row in cells:
-    #     for cell in row:
-    #         if cell.group > -1:
-    #             print(cell.group, end=" ")
-    #     print()
+    for row in cells:
+        for cell in row:
+            if cell.group > -1:
+                print(f"{cell.group:3d}", end=" ")
+        print()
+    print()
+
+    # for key in mapSets.keys():
+    #     print(key, len(mapSets[key]))
+
     while not closeWindow:
         if closeWindow:
             break
