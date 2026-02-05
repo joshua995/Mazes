@@ -3,7 +3,7 @@ Joshua Liu
 """
 
 import pygame
-from pygame.draw import line, rect
+from pygame.draw import line, rect, circle
 from random import randint, choice
 
 
@@ -37,7 +37,7 @@ class Cell:
         for i, wall in enumerate(self.walls):
             if self.wallsToDraw[i]:
                 pygame.draw.line(
-                    screen, colorList[i], wall[0], wall[1], width=widthList[i]
+                    screen, colorList[i], wall[0], wall[1], width=widthList[0]
                 )
 
     def getWhichNeighbour(self, cellToCheck):
@@ -73,9 +73,9 @@ BLACK, WHITE, GREEN = (0, 0, 0), (255, 255, 255), (0, 255, 0)
 
 WINDOW_SIZE = 750  # WINDOW_SIZE default 750
 screen = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
-pygame.display.set_caption("Prims"), screen.fill(BLACK)
+pygame.display.set_caption("Ellers"), screen.fill(BLACK)
 
-CELL_SIZE = 30  # change this to change the size of the maze BUG at 15
+CELL_SIZE = 50  # change this to change the size of the maze BUG at 15
 MAZE_DRAW_DELAY = 40  # Speed of which the maze generation is displayed in FPS
 PATH_DRAW_DELAY = 15  # Speed of which the path generation is displayed in FPS
 
@@ -133,8 +133,9 @@ if __name__ == "__main__":
     initcells()
     for cc in cells:
         for c in cc:
-            c.index = -1
+            c.group = -1
             c.visited = False
+            c.wallsToDraw = [True, True, True, True]
     mapSets = {}
     start = 0
     for cell in cells[0]:
@@ -150,6 +151,10 @@ if __name__ == "__main__":
                 mapSets[cell.rightNeighbour.group].remove(cell.rightNeighbour)
                 mapSets[cell.group].append(cell.rightNeighbour)
                 cell.rightNeighbour.group = cell.group
+                screen.fill(BLACK)
+                [[cell.drawWalls() for cell in cells[i]] for i in range(len(cells))]
+                clock.tick(MAZE_DRAW_DELAY)
+                pygame.display.update()
     for l in range(len(cells) - 1):
         listOfRowGroups = []
         for cell in cells[l]:
@@ -160,12 +165,15 @@ if __name__ == "__main__":
             )
         for group in listOfRowGroups:
             chosenCell = choice(mapSets[group])
-            if chosenCell.botNeighbour is not None:
-                chosenCell.wallsToDraw[3] = False
-                chosenCell.botNeighbour.wallsToDraw[1] = False
-                mapSets[chosenCell.group] = []
-                mapSets[chosenCell.group].append(chosenCell.botNeighbour)
-                chosenCell.botNeighbour.group = chosenCell.group
+            chosenCell.wallsToDraw[3] = False
+            chosenCell.botNeighbour.wallsToDraw[1] = False
+            mapSets[chosenCell.group] = []
+            mapSets[chosenCell.group].append(chosenCell.botNeighbour)
+            chosenCell.botNeighbour.group = chosenCell.group
+            screen.fill(BLACK)
+            [[cell.drawWalls() for cell in cells[i]] for i in range(len(cells))]
+            clock.tick(MAZE_DRAW_DELAY)
+            pygame.display.update()
         for cell in cells[l + 1]:
             if cell.group == -1:
                 cell.group = start
@@ -179,15 +187,19 @@ if __name__ == "__main__":
                     mapSets[cell.rightNeighbour.group].remove(cell.rightNeighbour)
                     mapSets[cell.group].append(cell.rightNeighbour)
                     cell.rightNeighbour.group = cell.group
+                    screen.fill(BLACK)
+                    [[cell.drawWalls() for cell in cells[i]] for i in range(len(cells))]
+                    clock.tick(MAZE_DRAW_DELAY)
+                    pygame.display.update()
 
-    mapSets = {}
+    # mapSets = {}
 
-    for cc in cells:
-        for c in cc:
-            if not mapSets.keys().__contains__(c.group):
-                mapSets.update({c.group: [c]})
-            else:
-                mapSets[c.group].append(c)
+    # for cc in cells:
+    #     for c in cc:
+    #         if not mapSets.keys().__contains__(c.group):
+    #             mapSets.update({c.group: [c]})
+    #         else:
+    #             mapSets[c.group].append(c)
 
     for cell in cells[len(cells) - 1]:
         if cell.rightNeighbour is not None:
@@ -197,15 +209,20 @@ if __name__ == "__main__":
             mapSets[cell.group].append(cell.rightNeighbour)
             cell.rightNeighbour.group = cell.group
 
-    for row in cells:
-        for cell in row:
-            if cell.group > -1:
-                print(f"{cell.group:3d}", end=" ")
-        print()
-    print()
+    # for row in cells:
+    #     for cell in row:
+    #         if cell.group > -1:
+    #             print(f"{cell.group:3d}", end=" ")
+    #     print()
+    # print()
 
     # for key in mapSets.keys():
     #     print(key, len(mapSets[key]))
+
+    row = choice(cells)
+    startCell = choice(row)
+    row = choice(cells)
+    endCell = choice(row)
 
     while not closeWindow:
         if closeWindow:
@@ -214,8 +231,14 @@ if __name__ == "__main__":
             if event.type == pygame.QUIT:
                 closeWindow = True
 
+        screen.fill(BLACK)
         [[cell.drawWalls() for cell in cells[i]] for i in range(len(cells))]
+
+        circle(
+            screen, GREEN, (startCell.center[0], startCell.center[1]), CELL_SIZE // 4
+        )
+        circle(screen, GREEN, (endCell.center[0], endCell.center[1]), CELL_SIZE // 4)
         if closeWindow:
             break
-        # clock.tick(0.5)
+        clock.tick(0.5)
         pygame.display.update()

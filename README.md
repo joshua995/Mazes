@@ -8,3 +8,6 @@ Binary Tree
 
 Prims
   - Run Prims.py 
+
+Eller's
+  - Run Ellers.py 

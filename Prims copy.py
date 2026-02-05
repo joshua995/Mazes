@@ -56,11 +56,19 @@ class Cell:
     def expand(self):
         self.visited = True
         visitedNeighbours = []
-        for n in self.neighbours:
-            if n.visited:
+        [
+            (
                 visitedNeighbours.append(n)
-            elif not n.visited and not frontier.__contains__(n):
-                frontier.append(n)
+                if n.visited
+                else (
+                    frontier.append(n)
+                    if not n.visited and not frontier.__contains__(n)
+                    else ""
+                )
+            )
+            for n in self.neighbours
+        ]
+
         cellToExpand = choice(visitedNeighbours)
         chosenVisited = self.getWhichNeighbour(cellToExpand)
         if chosenVisited == "left":
@@ -76,27 +84,39 @@ class Cell:
             self.wallsToDraw[3] = False
             cellToExpand.wallsToDraw[1] = False
 
-    def getWhichNeighbour(self, cellToCheck):
-        if self.leftNeighbour is not None and (
+    getWhichNeighbour = lambda self, cellToCheck: (
+        "left"
+        if self.leftNeighbour is not None
+        and (
             self.leftNeighbour.x == cellToCheck.x
             and self.leftNeighbour.y == cellToCheck.y
-        ):
-            return "left"
-        elif self.rightNeighbour is not None and (
-            self.rightNeighbour.x == cellToCheck.x
-            and self.rightNeighbour.y == cellToCheck.y
-        ):
-            return "right"
-        elif self.topNeighbour is not None and (
-            self.topNeighbour.x == cellToCheck.x
-            and self.topNeighbour.y == cellToCheck.y
-        ):
-            return "top"
-        elif self.botNeighbour is not None and (
-            self.botNeighbour.x == cellToCheck.x
-            and self.botNeighbour.y == cellToCheck.y
-        ):
-            return "bot"
+        )
+        else (
+            "right"
+            if self.rightNeighbour is not None
+            and (
+                self.rightNeighbour.x == cellToCheck.x
+                and self.rightNeighbour.y == cellToCheck.y
+            )
+            else (
+                "top"
+                if self.topNeighbour is not None
+                and (
+                    self.topNeighbour.x == cellToCheck.x
+                    and self.topNeighbour.y == cellToCheck.y
+                )
+                else (
+                    "bot"
+                    if self.botNeighbour is not None
+                    and (
+                        self.botNeighbour.x == cellToCheck.x
+                        and self.botNeighbour.y == cellToCheck.y
+                    )
+                    else ""
+                )
+            )
+        )
+    )
 
 
 pygame.init()
