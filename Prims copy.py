@@ -71,18 +71,27 @@ class Cell:
 
         cellToExpand = choice(visitedNeighbours)
         chosenVisited = self.getWhichNeighbour(cellToExpand)
-        if chosenVisited == "left":
-            self.wallsToDraw[0] = False
-            cellToExpand.wallsToDraw[2] = False
-        elif chosenVisited == "right":
-            self.wallsToDraw[2] = False
-            cellToExpand.wallsToDraw[0] = False
-        elif chosenVisited == "top":
-            self.wallsToDraw[1] = False
-            cellToExpand.wallsToDraw[3] = False
-        elif chosenVisited == "bot":
-            self.wallsToDraw[3] = False
-            cellToExpand.wallsToDraw[1] = False
+        (
+            self.undrawWalls(cellToExpand, 0, 2, False)
+            if chosenVisited == "left"
+            else (
+                self.undrawWalls(cellToExpand, 2, 0, False)
+                if chosenVisited == "right"
+                else (
+                    self.undrawWalls(cellToExpand, 1, 3, False)
+                    if chosenVisited == "top"
+                    else (
+                        self.undrawWalls(cellToExpand, 3, 1, False)
+                        if chosenVisited == "bot"
+                        else ""
+                    )
+                )
+            )
+        )
+
+    def undrawWalls(self, otherCell, selfIndex, otherIndex, bool):
+        self.wallsToDraw[selfIndex] = bool
+        otherCell.wallsToDraw[otherIndex] = bool
 
     getWhichNeighbour = lambda self, cellToCheck: (
         "left"
