@@ -167,13 +167,14 @@ if __name__ == "__main__":
             chosenCell = choice(mapSets[group])
             chosenCell.wallsToDraw[3] = False
             chosenCell.botNeighbour.wallsToDraw[1] = False
-            mapSets[chosenCell.group] = []
+            mapSets[chosenCell.group]=[]
             mapSets[chosenCell.group].append(chosenCell.botNeighbour)
             chosenCell.botNeighbour.group = chosenCell.group
             screen.fill(BLACK)
             [[cell.drawWalls() for cell in cells[i]] for i in range(len(cells))]
             clock.tick(MAZE_DRAW_DELAY)
             pygame.display.update()
+
         for cell in cells[l + 1]:
             if cell.group == -1:
                 cell.group = start
