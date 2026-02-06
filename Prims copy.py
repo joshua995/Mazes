@@ -41,17 +41,11 @@ class Cell:
         self.botNeighbour = None
         self.neighbours = []  # keeps track of its neighbours
 
-    def getNeighbourWithPreviousIndex(self):  # used for path generation
-        for n in self.neighbours:
-            if n.index == self.index - 1:
-                return n
-
-    def drawWalls(self):
-        for i, wall in enumerate(self.walls):
-            if self.wallsToDraw[i]:
-                pygame.draw.line(
-                    screen, colorList[i], wall[0], wall[1], width=widthList[i]
-                )
+    drawWalls = lambda self: [
+        pygame.draw.line(screen, colorList[i], wall[0], wall[1], width=widthList[i])
+        for i, wall in enumerate(self.walls)
+        if self.wallsToDraw[i]
+    ]
 
     def expand(self):
         self.visited = True
@@ -140,7 +134,7 @@ WINDOW_SIZE = 750  # WINDOW_SIZE default 750
 screen = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
 pygame.display.set_caption("Prims"), screen.fill(BLACK)
 
-CELL_SIZE = 30  # change this to change the size of the maze BUG at 15
+CELL_SIZE = 10  # change this to change the size of the maze BUG at 15
 MAZE_DRAW_DELAY = 40  # Speed of which the maze generation is displayed in FPS
 PATH_DRAW_DELAY = 15  # Speed of which the path generation is displayed in FPS
 
@@ -187,32 +181,11 @@ def getCellNeighbours():
                 c.neighbours.append(c1)
 
 
-def recDrawPath(cell, closeWindow):
-    for n in cell.neighbours:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return True
-        if cell.index - 1 != n.index:
-            continue
-        rect1 = pygame.Rect(
-            cell.center[0] - CELL_SIZE // 4,
-            cell.center[1] - CELL_SIZE // 4,
-            CELL_SIZE // 2,
-            CELL_SIZE // 2,
-        )
-        rect(screen, GREEN, rect1)
-        line(screen, GREEN, n.center, cell.center, CELL_SIZE // 2)
-        clock.tick(PATH_DRAW_DELAY)
-        pygame.display.update()
-        closeWindow = recDrawPath(n, closeWindow)
-    return closeWindow
-
-
 if __name__ == "__main__":
     initcells()
-    for c in cells:
-        c.index = -1
-        c.visited = False
+    # for c in cells:
+    #     c.index = -1
+    #     c.visited = False
     startCell = choice(cells)
     startCell.visited = True
     endCell = choice(cells)
