@@ -116,10 +116,20 @@ def createMaze():
             )
             mazeData.append([lineStart, lineEnd, CELL_SIZE // 2, rect1])
             # Change the color of the maze to make a gradient path
-            rect(screen, (len(mazeData) * 1 % 255, 25, 0), rect1)
+            # squares the corners so it is not rounded
+            # rect(screen, (len(mazeData) * 1 % 255, 25, 0), rect1)
+            # line(
+            #     screen,
+            #     (len(mazeData) * 1 % 255, 25, 0),
+            #     lineStart,
+            #     lineEnd,
+            #     CELL_SIZE // 2,
+            # )
+            # Draw with one color
+            rect(screen, WHITE, rect1)
             line(
                 screen,
-                (len(mazeData) * 1 % 255, 25, 0),
+                WHITE,
                 lineStart,
                 lineEnd,
                 CELL_SIZE // 2,
