@@ -32,13 +32,13 @@ clock = pygame.time.Clock()
 
 BLACK, WHITE, GREEN = (0, 0, 0), (255, 255, 255), (0, 255, 0)
 
-WINDOW_SIZE = [1500, 750]  # WINDOW_SIZE default 750
+WINDOW_SIZE = [750, 750]  # WINDOW_SIZE default 750
 screen = pygame.display.set_mode((WINDOW_SIZE[0], WINDOW_SIZE[1]))
 pygame.display.set_caption("Recursive Backtracking"), screen.fill(BLACK)
 
 CELL_SIZE = 10  # change this to change the size of the maze
-MAZE_DRAW_DELAY = 256  # Speed of which the maze generation is displayed in FPS
-PATH_DRAW_DELAY = 128  # Speed of which the path generation is displayed in FPS
+MAZE_DRAW_DELAY = 128  # Speed of which the maze generation is displayed in FPS
+PATH_DRAW_DELAY = 64  # Speed of which the path generation is displayed in FPS
 
 CELLS_SIZE = [WINDOW_SIZE[0] // CELL_SIZE, WINDOW_SIZE[1] // CELL_SIZE]
 cells = []
@@ -115,6 +115,7 @@ def createMaze():
                 CELL_SIZE // 2,
             )
             mazeData.append([lineStart, lineEnd, CELL_SIZE // 2, rect1])
+            # Change the color of the maze to make a gradient path
             rect(screen, (len(mazeData) * 1 % 255, 25, 0), rect1)
             line(
                 screen,
