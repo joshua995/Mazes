@@ -175,12 +175,19 @@ if __name__ == "__main__":
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 closeWindow = True
+        # [
+        #     (
+        #         line(screen, (i * 1 % 255, 25, 0), data[0], data[1], data[2]),
+        #         rect(screen, (i * 1 % 255, 25, 0), data[3]),
+        #     )
+        #     for i, data in enumerate(mazeData)
+        # ]
         [
             (
-                line(screen, (i * 1 % 255, 25, 0), data[0], data[1], data[2]),
-                rect(screen, (i * 1 % 255, 25, 0), data[3]),
+                line(screen, WHITE, data[0], data[1], data[2]),
+                rect(screen, WHITE, data[3]),
             )
-            for i, data in enumerate(mazeData)
+            for data in mazeData
         ]
 
         circle(screen, GREEN, (startCell.centerX, startCell.centerY), CELL_SIZE // 4)
